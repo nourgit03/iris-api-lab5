@@ -4,6 +4,6 @@ metadata:
   name: iris-config
   namespace: iris
 data:
-  ENVIRONMENT: "minikube"
+  ENVIRONMENT: "aks"
   LOG_LEVEL: "INFO"
   STARTUP_DELAY: "5"
