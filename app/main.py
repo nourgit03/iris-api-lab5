@@ -60,7 +60,7 @@ class Features(BaseModel):
 
 @app.get("/")
 def root():
-    return {"service": "iris-api", "version": APP_VERSION,
+    return {"service": "iris-api (CI/CD)", "version": APP_VERSION,
             "environment": ENVIRONMENT, "pod": POD}
 
 
