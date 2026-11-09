@@ -1,0 +1,29 @@
+# Partie 2 : build + push de v1 et v2 dans ACR depuis un runner GitHub (OIDC)
+# (az login est bloque par l'acces conditionnel de l'ecole dans Codespaces)
+name: push-acr-v1-v2
+on:
+  workflow_dispatch:
+permissions:
+  id-token: write
+  contents: read
+jobs:
+  build-push:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Azure login (OIDC, no stored password)
+        uses: azure/login@v3
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      - name: Build and push iris-api v1 and v2 (amd64 runner)
+        run: |
+          az acr login --name "${{ vars.ACR_NAME }}"
+          IMG="${{ vars.ACR_NAME }}.azurecr.io/iris-api"
+          docker build -t "$IMG:v1" .
+          docker build --build-arg APP_VERSION=2.0.0 -t "$IMG:v2" .
+          docker images iris-api; docker images "$IMG"
+          docker push "$IMG:v1"
+          docker push "$IMG:v2"
+          az acr repository show-tags --name "${{ vars.ACR_NAME }}" --repository iris-api -o table
